@@ -52,6 +52,7 @@ class Broker:
             with self._ts_lock:
                 assert isinstance(time, (str, datetime, np.datetime64))
                 assert self._microgrid is not None
+                time = pd.to_datetime(time, utc=True)
                 self._microgrid_ts.append((time, self._microgrid))
                 self._actor_infos_ts.append((time, self._actor_infos))
                 self._p_delta_ts.append((time, self._p_delta))
@@ -84,8 +85,8 @@ class Broker:
         start_time: Optional[DatetimeLike],
         end_time: Optional[DatetimeLike],
     ) -> list[tuple[DatetimeLike, Any]]:
-        start_idx = 0 if start_time is None else bisect_left(series, (start_time,))
-        end_idx = len(series) if end_time is None else bisect_right(series, (end_time,))
+        start_idx = 0 if start_time is None else bisect_left(series, (pd.to_datetime(start_time, utc=True),))
+        end_idx = len(series) if end_time is None else bisect_right(series, (pd.to_datetime(end_time, utc=True),))
         return series[start_idx:end_idx]
 
     def get_microgrid_ts(
