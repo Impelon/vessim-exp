@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional
+import math
 
 from loguru import logger
 
@@ -54,7 +55,8 @@ class SimpleBattery(Storage):
         if duration <= 0.0:
             raise ValueError("Duration needs to be a positive value")
 
-        assert self.min_soc <= self.soc(), "Minimum SoC can not be smaller than the current SoC"
+        if self.min_soc > self.soc():
+            assert math.isclose(self.min_soc, self.soc(), rel_tol=1e-6, abs_tol=1e-6), "Minimum SoC can not be smaller than the current SoC"
         if self.c_rate is not None:
             max_power = self.c_rate * self.capacity / 3600
             if power >= max_power:
